@@ -1,0 +1,847 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxDataAge",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_minUpdateInterval",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_version",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidConfidence",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidVariance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StaleData",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TooSoonToUpdate",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "Unauthorized",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "oldAdmin",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "AdminTransferred",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "maxDataAge",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "minUpdateInterval",
+        "type": "uint256"
+      }
+    ],
+    "name": "ParametersUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      }
+    ],
+    "name": "UpdaterAdded",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      }
+    ],
+    "name": "UpdaterRemoved",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "oldVersion",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "newVersion",
+        "type": "uint256"
+      }
+    ],
+    "name": "VersionUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "variance",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "volatility",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "regime",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "bytes32",
+        "name": "modelHash",
+        "type": "bytes32"
+      }
+    ],
+    "name": "VolatilityUpdated",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      }
+    ],
+    "name": "addUpdater",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "admin",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "variance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volatility",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "confidence",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "regime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hestonVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "egarchVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ivVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ethPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "modelHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct VolatilityOracle.VolatilityData[]",
+        "name": "dataList",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "batchUpdateVolatility",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "keepLast",
+        "type": "uint256"
+      }
+    ],
+    "name": "clearHistory",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "n",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAverageVariance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFusionWeights",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "hestonWeight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "egarchWeight",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ivWeight",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct VolatilityOracle.FusionWeights",
+        "name": "weights",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "index",
+        "type": "uint256"
+      }
+    ],
+    "name": "getHistoricalData",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "variance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volatility",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "confidence",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "regime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hestonVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "egarchVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ivVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ethPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "modelHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct VolatilityOracle.VolatilityData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getHistoryCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getLatestVolatility",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "variance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volatility",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "confidence",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "regime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hestonVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "egarchVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ivVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ethPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "modelHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct VolatilityOracle.VolatilityData",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getRegime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "regime",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getVarianceWithCheck",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "variance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "isStale",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "history",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "variance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "volatility",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "confidence",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "regime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "hestonVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "egarchVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ivVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ethPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "modelHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "isFresh",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "isFresh",
+        "type": "bool"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ageSeconds",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "isUpdater",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "lastUpdateTime",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestData",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "variance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "volatility",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "confidence",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "regime",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "hestonVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "egarchVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ivVariance",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "ethPrice",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes32",
+        "name": "modelHash",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "maxDataAge",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "minUpdateInterval",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "updater",
+        "type": "address"
+      }
+    ],
+    "name": "removeUpdater",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_maxDataAge",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMaxDataAge",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_minUpdateInterval",
+        "type": "uint256"
+      }
+    ],
+    "name": "setMinUpdateInterval",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newAdmin",
+        "type": "address"
+      }
+    ],
+    "name": "transferAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "newVersion",
+        "type": "uint256"
+      }
+    ],
+    "name": "updateVersion",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "uint256",
+            "name": "timestamp",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "variance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "volatility",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "confidence",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "regime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "hestonVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "egarchVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ivVariance",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "ethPrice",
+            "type": "uint256"
+          },
+          {
+            "internalType": "bytes32",
+            "name": "modelHash",
+            "type": "bytes32"
+          }
+        ],
+        "internalType": "struct VolatilityOracle.VolatilityData",
+        "name": "data",
+        "type": "tuple"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      }
+    ],
+    "name": "updateVolatility",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
